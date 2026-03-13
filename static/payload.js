@@ -79,6 +79,12 @@
         }
 
         scrollDebounce = requestAnimationFrame(() => {
+            // Redundancy: if the native "Scroll to bottom" button is present, click it.
+            const scrollBtn = document.querySelector('button[aria-label="Scroll to bottom"]');
+            if (scrollBtn) {
+                scrollBtn.click();
+            }
+
             for (const container of scrollableContainers) {
                 container.scrollTop = container.scrollHeight;
             }
