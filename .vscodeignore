@@ -10,3 +10,7 @@ tsconfig.json
 *.bak
 *.log
 *.map
+*.tgz
+out.txt
+package/
+${CLAUDE_PLUGIN_ROOT}/

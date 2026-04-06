@@ -67,8 +67,13 @@ export async function applyAutoScrollPatch(context: vscode.ExtensionContext): Pr
             return; // Already patched
         }
 
-        const payloadPath = vscode.Uri.file(path.join(context.extensionPath, 'static', 'payload.js')).with({ scheme: 'vscode-file' });
-        const scriptTag = `\n\t<!-- BA: Auto-Scroller Payload -->\n\t<script src="${payloadPath.toString()}"></script>\n`;
+        // Deploy payload alongside workbench.html to bypass CSP restrictions
+        const payloadSourcePath = path.join(context.extensionPath, 'static', 'payload.js');
+        const workbenchDir = path.dirname(paths.workbenchHtmlPath);
+        const destPath = path.join(workbenchDir, 'ba-auto-scroll-payload.js');
+        await fsp.copyFile(payloadSourcePath, destPath);
+
+        const scriptTag = `\n\t<!-- BA: Auto-Scroller Payload -->\n\t<script src="ba-auto-scroll-payload.js"></script>\n`;
 
         // Create Backup
         const backupPath = paths.workbenchHtmlPath + '.bak';
@@ -142,6 +147,12 @@ export async function removeAutoScrollPatch(): Promise<void> {
             await fsp.copyFile(productBackupPath, paths.productJsonPath);
             await fsp.unlink(productBackupPath);
             restored = true;
+        }
+
+        // Clean up deployed payload
+        const deployedPayload = path.join(path.dirname(paths.workbenchHtmlPath), 'ba-auto-scroll-payload.js');
+        if (fs.existsSync(deployedPayload)) {
+            await fsp.unlink(deployedPayload);
         }
 
         if (restored) {

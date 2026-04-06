@@ -7,10 +7,10 @@
  */
 
 import * as vscode from 'vscode';
-import { AntigravitySDK } from 'antigravity-sdk';
+import { AntigravitySDK, Logger } from 'antigravity-sdk';
 import { autoApply } from './auto-run';
-import { status, revertAutoRun } from './commands';
 import { applyAutoScrollPatch, removeAutoScrollPatch } from './auto-scroll';
+import { status, revertAutoRun } from './commands';
 
 let sdk: AntigravitySDK | null = null;
 let output: vscode.OutputChannel;
@@ -23,6 +23,7 @@ function log(msg: string): void {
 export async function activate(context: vscode.ExtensionContext) {
     output = vscode.window.createOutputChannel('Better Antigravity');
     context.subscriptions.push(output);
+    Logger.setOutput(msg => output.appendLine(msg));
     log('Activating...');
 
     // ── Commands ──────────────────────────────────────────────────────
@@ -30,10 +31,8 @@ export async function activate(context: vscode.ExtensionContext) {
         vscode.commands.registerCommand('better-antigravity.status', () => status(sdk, output)),
         vscode.commands.registerCommand('better-antigravity.revertAutoRun', revertAutoRun),
         vscode.commands.registerCommand('better-antigravity.removeAutoScrollPatch', removeAutoScrollPatch),
+        vscode.commands.registerCommand('better-antigravity.revertAutoScroll', removeAutoScrollPatch),
     );
-
-    // ── Auto-Scroll Patch ──────────────────────────────────────────────
-    applyAutoScrollPatch(context);
 
     // ── Auto-Run Fix (async, non-blocking, no prompt) ─────────────────
     autoApply().then(fixResults => {
@@ -41,6 +40,11 @@ export async function activate(context: vscode.ExtensionContext) {
             log(`[auto-run] ${r.label}: ${r.status}${r.bytesAdded ? ` (+${r.bytesAdded}b)` : ''}${r.error ? ` -- ${r.error}` : ''}`);
         }
     });
+
+    // ── Auto-Scroll Fix (async, non-blocking) ─────────────────────────
+    applyAutoScrollPatch(context).then(() => {
+        log('[auto-scroll] Check/Patch sequence completed');
+    }).catch(err => log(`[auto-scroll] Error: ${err.message}`));
 
     // ── SDK Init ─────────────────────────────────────────────────────
     try {

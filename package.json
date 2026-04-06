@@ -2,7 +2,7 @@
   "name": "better-antigravity",
   "displayName": "Better Antigravity",
   "description": "Community-driven fixes and improvements for Antigravity IDE — auto-run fix, chat rename, and more",
-  "version": "0.6.0",
+  "version": "0.8.0",
   "publisher": "kanezal",
   "icon": "static/BA-background.png",
   "galleryBanner": {
@@ -31,6 +31,7 @@
     "vscode": "^1.85.0",
     "node": ">=16.0.0"
   },
+  "antigravityVersions": ">=1.107.0",
   "categories": [
     "Other"
   ],
@@ -84,10 +85,16 @@
     "antigravity",
     "antigravity-ide",
     "google-antigravity",
+    "google antigravity",
+    "antigravity extension",
     "fix",
     "auto-run",
+    "always proceed",
+    "terminal auto execute",
     "rename-chat",
-    "community"
+    "chat rename",
+    "community",
+    "productivity"
   ],
   "devDependencies": {
     "@types/node": "^20.0.0",
@@ -95,7 +102,7 @@
     "esbuild": "^0.20.0"
   },
   "dependencies": {
-    "antigravity-sdk": "^1.5.0",
+    "antigravity-sdk": "^1.7.0",
     "sql.js": "^1.14.0"
   }
 }
